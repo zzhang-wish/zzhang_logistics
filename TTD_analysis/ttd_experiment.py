@@ -91,7 +91,7 @@ def t_test_welchs(df,treatment_name,control_name,imp,clk):
     nu_a = n_a - 1
     nu_b = n_b - 1
     
-    df = ( (var_a / n_a + var_b / n_b)**2 ) / ( (var_a*var_a) / (n_a*n_a * nu_a) + (var_b*var_b) / (n_b*n_b * nu_b) )
+    df = ((var_a / n_a + var_b / n_b)**2) / ( (var_a/n_a)**2 /(nu_a) + (var_b/n_b)**2 /(nu_b) )
     
     p = (1 - stats.t.cdf(np.abs(t), df=df))*2
 
