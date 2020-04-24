@@ -75,3 +75,75 @@ def chi_2_test(df,treatment_name,control_name,imp,clk):
 
 
 
+def t_test_welchs(df,treatment_name,control_name,imp,clk):
+    
+    n_a = df.loc[df.new_groups==control_name,imp].sum() 
+    n_b = df.loc[df.new_groups==treatment_name,imp].sum() 
+    
+    mean_a = df.loc[df.new_groups==control_name,clk].sum() / df.loc[df.new_groups==control_name,imp].sum()
+    mean_b = df.loc[df.new_groups==treatment_name,clk].sum() / df.loc[df.new_groups==treatment_name,imp].sum()
+    
+    var_a = mean_a*(1-mean_a)
+    var_b = mean_b*(1-mean_b)
+    
+    t = (mean_a - mean_b) / np.sqrt(var_a/n_a + var_b/n_b)
+
+    nu_a = n_a - 1
+    nu_b = n_b - 1
+    
+    df = ( (var_a / n_a + var_b / n_b)**2 ) / ( (var_a*var_a) / (n_a*n_a * nu_a) + (var_b*var_b) / (n_b*n_b * nu_b) )
+    
+    p = (1 - stats.t.cdf(np.abs(t), df=df))*2
+
+    return p,mean_a,mean_b
+
+
+
+def t_test_classic(df,treatment_name,control_name,imp,clk):
+    
+    mean_a = df.loc[df.new_groups==control_name,clk].sum() / df.loc[df.new_groups==control_name,imp].sum()
+    mean_b = df.loc[df.new_groups==treatment_name,clk].sum() / df.loc[df.new_groups==treatment_name,imp].sum()
+    
+    var_a = mean_a*(1-mean_a)
+    var_b = mean_b*(1-mean_b)
+    
+    n_a = df.loc[df.new_groups==control_name,imp].sum() 
+    n_b = df.loc[df.new_groups==treatment_name,imp].sum() 
+    N = n_a + n_b
+    df = N - 2
+    
+    s = np.sqrt( ((n_a-1)*var_a+(n_b-1)*var_b)/df )
+    
+    t = (mean_b - mean_a) / (s * np.sqrt(1.0/n_a + 1.0/n_b))
+    
+    # one-tailed p value need to *2
+    p = (1 - stats.t.cdf(np.abs(t), df=df))*2 
+    
+    return p,mean_a,mean_b
+    
+    
+    
+def t_test_classic_uid(df,treatment_name,control_name,mean,std,n_name):
+    
+    mean_a = df.loc[df.new_groups==control_name,mean].mean()
+    mean_b = df.loc[df.new_groups==treatment_name,mean].mean()
+    
+    std_a = df.loc[df.new_groups==control_name,std].mean()
+    std_b = df.loc[df.new_groups==treatment_name,std].mean()
+    
+    var_a =std_a*std_a
+    var_b = std_b*std_b
+    
+    n_a = df.loc[df.new_groups==control_name,n_name].sum() 
+    n_b = df.loc[df.new_groups==treatment_name,n_name].sum() 
+    N = n_a + n_b
+    df = N - 2
+    
+    s = np.sqrt( ((n_a-1)*var_a+(n_b-1)*var_b)/df )
+    
+    t = (mean_b - mean_a) / (s * np.sqrt(1.0/n_a + 1.0/n_b))
+    
+    # one-tailed p value need to *2
+    p = (1 - stats.t.cdf(np.abs(t), df=df))*2 
+    
+    return p,mean_a,mean_b
